@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 - unreleased
+## 0.2.0 - 2026-11-23
 
 The OPC UA part of the PoC, through the FIWARE IoT Agent for OPC UA (interim: it will be replaced by
 coraine's own OPC UA bridge once the coraine image includes it).
