@@ -1,0 +1,79 @@
+{
+  "devices": [
+    {
+      "device_id": "press-1",
+      "entity_name": "urn:ngsi-ld:Machine:press-1",
+      "entity_type": "Machine",
+      "apikey": "iot",
+      "endpoint": "opc.tcp://opcplc:50000",
+      "attributes": [
+        {
+          "name": "cycleCount",
+          "type": "Number"
+        },
+        {
+          "name": "running",
+          "type": "Boolean"
+        },
+        {
+          "name": "temperature",
+          "type": "Number"
+        },
+        {
+          "name": "vibration",
+          "type": "Number"
+        }
+      ],
+      "static_attributes": [
+        {
+          "name": "name",
+          "type": "Property",
+          "value": "Press 1"
+        },
+        {
+          "name": "inCell",
+          "type": "Relationship",
+          "value": "urn:ngsi-ld:RobotCell:arise-poc"
+        }
+      ],
+      "lazy": [],
+      "commands": [],
+      "internal_attributes": {
+        "contexts": [
+          {
+            "id": "press-1",
+            "type": "Machine",
+            "mappings": [
+              {
+                "ocb_id": "cycleCount",
+                "opcua_id": "ns=3;s=StepUp",
+                "object_id": "ns=3;s=StepUp",
+                "inputArguments": []
+              },
+              {
+                "ocb_id": "running",
+                "opcua_id": "ns=3;s=AlternatingBoolean",
+                "object_id": "ns=3;s=AlternatingBoolean",
+                "inputArguments": []
+              },
+              {
+                "ocb_id": "temperature",
+                "opcua_id": "ns=3;s=PositiveTrendData",
+                "object_id": "ns=3;s=PositiveTrendData",
+                "inputArguments": []
+              },
+              {
+                "ocb_id": "vibration",
+                "opcua_id": "ns=3;s=SpikeData",
+                "object_id": "ns=3;s=SpikeData",
+                "inputArguments": []
+              }
+            ]
+          }
+        ],
+        "contextSubscriptions": [],
+        "events": []
+      }
+    }
+  ]
+}

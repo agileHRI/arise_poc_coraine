@@ -1,0 +1,235 @@
+{
+  "uid": "arise-press-opcua",
+  "title": "ARISE PoC - Press (OPC UA)",
+  "tags": [
+    "arise",
+    "coraine",
+    "opcua"
+  ],
+  "schemaVersion": 39,
+  "editable": true,
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Press 1 - Temperature (alert above 103)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql-arise"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql-arise"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  replace(a.attr_name, 'https://uri.etsi.org/ngsi-ld/default-context/', '') AS metric,\n  a.v_number AS value\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Machine:press-1'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/temperature'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 103
+              }
+            ]
+          },
+          "custom": {
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Press 1 - Vibration",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql-arise"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql-arise"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  replace(a.attr_name, 'https://uri.etsi.org/ngsi-ld/default-context/', '') AS metric,\n  a.v_number AS value\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Machine:press-1'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/vibration'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Press 1 - Cycle count",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql-arise"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql-arise"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  replace(a.attr_name, 'https://uri.etsi.org/ngsi-ld/default-context/', '') AS metric,\n  a.v_number AS value\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Machine:press-1'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/cycleCount'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Press 1 - Running (1 = on)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql-arise"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql-arise"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  CASE WHEN a.v_bool THEN 1 ELSE 0 END AS running\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Machine:press-1'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/running'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Press 1 now (coraine NGSI-LD API, tenant arise)",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "coraine-api-arise"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api-arise"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "http://coraine:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Machine:press-1",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "",
+          "columns": [
+            {
+              "selector": "cycleCount.value",
+              "text": "cycleCount",
+              "type": "number"
+            },
+            {
+              "selector": "running.value",
+              "text": "running",
+              "type": "string"
+            },
+            {
+              "selector": "temperature.value",
+              "text": "temperature",
+              "type": "number"
+            },
+            {
+              "selector": "vibration.value",
+              "text": "vibration",
+              "type": "number"
+            },
+            {
+              "selector": "inCell.object",
+              "text": "inCell",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

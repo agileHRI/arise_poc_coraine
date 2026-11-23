@@ -63,15 +63,66 @@ services:
     restart: "no"
     volumes:
       - ./seed:/seed:ro
+    entrypoint: ["sh", "-c"]
     command:
-      - -sS
-      - -X
-      - POST
-      - http://coraine:1026/ngsi-ld/v1/entityOperations/upsert
-      - -H
-      - "Content-Type: application/json"
-      - --data-binary
-      - "@/seed/arena.json"
+      - >
+        curl -sS -X POST http://coraine:1026/ngsi-ld/v1/entityOperations/upsert
+        -H "Content-Type: application/json" --data-binary @/seed/arena.json &&
+        curl -sS -X POST http://coraine:1026/ngsi-ld/v1/entityOperations/upsert
+        -H "Content-Type: application/json" -H "NGSILD-Tenant: arise" --data-binary @/seed/cell-opcua.json
+
+  # --- OPC UA part (interim: FIWARE IoT Agent; to be replaced by coraine's OPC UA bridge) ---
+
+  # An OPC UA server to test with: Microsoft's OPC PLC simulator (MIT). Its nodes change on their own.
+  opcplc:
+    image: mcr.microsoft.com/iotedge/opc-plc:2.15.10
+    command: ["--pn=50000", "--autoaccept", "--unsecuretransport", "--sn=0", "--fn=0"]
+
+  # FIWARE IoT Agent for OPC UA: reads the OPC UA nodes and writes them to coraine over NGSI-LD.
+  iot-agent:
+    image: iotagent4fiware/iotagent-opcua:2.3.2
+    depends_on:
+      coraine:
+        condition: service_healthy
+      opcplc:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      - CONFIGURATION_TYPE=dynamic
+      - IOTA_CB_HOST=coraine
+      - IOTA_CB_PORT=1026
+      - IOTA_CB_NGSIVERSION=ld
+      - IOTA_NORTH_PORT=4041
+      - IOTA_REGISTRY_TYPE=memory
+      - IOTA_PROVIDER_URL=http://iot-agent:4041
+      - IOTA_DEFAULTRESOURCE=/iot/opcua
+      - IOTA_TIMESTAMP=true
+      - IOTA_EXPLICITATTRS=true
+      - IOTA_AUTOPROVISION=false
+      - IOTA_LOGLEVEL=INFO
+      - IOTA_OPCUA_ENDPOINT=opc.tcp://opcplc:50000
+      - IOTA_OPCUA_SECURITY_MODE=None
+      - IOTA_OPCUA_SECURITY_POLICY=None
+      - IOTA_OPCUA_UNIQUE_SUBSCRIPTION=false
+      - IOTA_OPCUA_SUBSCRIPTION_REQ_PUBLISHING_INTERVAL=1000
+      - IOTA_OPCUA_MT_POLLING=false
+
+  # Provisions the press on the IoT Agent once: which OPC UA node becomes which attribute.
+  iot-provision:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      - iot-agent
+    restart: "no"
+    volumes:
+      - ./seed:/seed:ro
+    entrypoint: ["sh", "-c"]
+    command:
+      - >
+        until curl -sf http://iot-agent:4041/iot/about > /dev/null; do sleep 2; done;
+        curl -sS -X POST http://iot-agent:4041/iot/devices
+        -H "fiware-service: arise" -H "fiware-servicepath: /"
+        -H "Content-Type: application/json"
+        --data-binary @/seed/press-device.json
 
   # Serves the descriptor that makes this PoC a named demo in c3.
   c3-descriptor:

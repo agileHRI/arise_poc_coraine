@@ -66,3 +66,56 @@ groups:
         annotations:
           summary: '{{ $labels.turtle }} is near a wall'
           description: '{{ $labels.turtle }} is {{ printf "%.2f" $values.A.Value }} m from the nearest wall of the arena.'
+
+  - orgId: 1
+    name: arise-press
+    folder: ARISE PoC
+    interval: 10s
+    rules:
+      - uid: arise-press-temperature-high
+        title: Press temperature high
+        condition: C
+        data:
+          # A - the last temperature of the press (OPC UA, tenant "arise")
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: coraine-history-sql-arise
+            model:
+              refId: A
+              editorMode: code
+              format: table
+              rawQuery: true
+              rawSql: |
+                SELECT
+                  replace(a.entity_id, 'urn:ngsi-ld:', '') AS machine,
+                  a.v_number AS temperature
+                FROM troe_attrs a
+                WHERE a.entity_id = 'urn:ngsi-ld:Machine:press-1'
+                  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/temperature'
+                ORDER BY a.modified_at DESC
+                LIMIT 1
+          # C - firing above 103 (the simulated temperature starts at 100 and rises about 1.2 per minute)
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [103]
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          severity: critical
+          system: arise-poc
+        annotations:
+          summary: '{{ $labels.machine }} temperature is high'
+          description: '{{ $labels.machine }} temperature is {{ printf "%.1f" $values.A.Value }} (limit 103).'
