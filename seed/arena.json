@@ -1,0 +1,15 @@
+[
+  {
+    "id": "urn:ngsi-ld:RobotCell:arise-poc",
+    "type": "RobotCell",
+    "name": { "type": "Property", "value": "ARISE PoC robot cell" }
+  },
+  {
+    "id": "urn:ngsi-ld:Arena:turtlesim",
+    "type": "Arena",
+    "name": { "type": "Property", "value": "Turtlesim arena" },
+    "width": { "type": "Property", "value": 11.09, "unitCode": "MTR" },
+    "height": { "type": "Property", "value": 11.09, "unitCode": "MTR" },
+    "inCell": { "type": "Relationship", "object": "urn:ngsi-ld:RobotCell:arise-poc" }
+  }
+]

@@ -1,0 +1,12 @@
+# Copyright 2026 Seamware
+# SPDX-License-Identifier: Apache-2.0
+#
+apiVersion: 1
+
+providers:
+  - name: arise
+    folder: ARISE PoC
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

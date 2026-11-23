@@ -1,0 +1,111 @@
+# Copyright 2026 Seamware
+# SPDX-License-Identifier: Apache-2.0
+#
+# ARISE PoC with coraine - ROS 2 turtles, history in TimescaleDB, Grafana dashboards, c3 demo descriptor.
+# See: How-to Guides > Run the ARISE PoC with coraine
+services:
+
+  timescale:
+    image: timescale/timescaledb-ha:pg17-ts2.18
+    environment:
+      - POSTGRES_USER=coraine
+      - POSTGRES_PASSWORD=coraine
+    volumes:
+      - timescale_data:/home/postgres/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coraine"]
+      interval: 5s
+      retries: 30
+
+  coraine:
+    image: quay.io/seamware/coraine:0.7.0
+    ipc: host
+    ports:
+      - "1026:1026"
+    depends_on:
+      timescale:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - CORAINE_TROEPWD=coraine
+    command:
+      - --database
+      - corDB
+      - --dbDir
+      - /data
+      - --troe
+      - timescale
+      - --troeHost
+      - timescale
+      - --troeUser
+      - coraine
+      - --troeName
+      - arise
+      - --apiPlugins
+      - admin
+      - --transports
+      - ws
+      - --bridges
+      - dds
+      - --bridgeConfig
+      - /opt/seamware/etc/dds.json
+    volumes:
+      - ./dds.json:/opt/seamware/etc/dds.json:ro
+      - coraine_data:/data
+      - dds_types:/opt/seamware/etc/dds-types
+
+  # Creates the static part of the model once: the robot cell and the arena.
+  seed:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      coraine:
+        condition: service_healthy
+    restart: "no"
+    volumes:
+      - ./seed:/seed:ro
+    command:
+      - -sS
+      - -X
+      - POST
+      - http://coraine:1026/ngsi-ld/v1/entityOperations/upsert
+      - -H
+      - "Content-Type: application/json"
+      - --data-binary
+      - "@/seed/arena.json"
+
+  # Serves the descriptor that makes this PoC a named demo in c3.
+  c3-descriptor:
+    image: busybox:1.36
+    ports:
+      - "7996:7996"
+    command: ["httpd", "-f", "-p", "7996", "-h", "/www"]
+    volumes:
+      - ./c3:/www:ro
+
+  ros2:
+    build: ./ros2
+    image: arise-poc-turtlesim:jazzy
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY:-}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+  grafana:
+    image: grafana/grafana:13.0.1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - coraine
+    environment:
+      - GF_PLUGINS_PREINSTALL_SYNC=yesoreyeram-infinity-datasource@4.1.5
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  timescale_data:
+  coraine_data:
+  dds_types:
+  grafana_data:

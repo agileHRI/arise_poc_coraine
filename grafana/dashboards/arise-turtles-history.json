@@ -1,0 +1,239 @@
+{
+  "uid": "arise-turtles-history",
+  "title": "ARISE PoC - Turtles (history, NGSI-LD temporal API)",
+  "tags": [
+    "arise",
+    "coraine"
+  ],
+  "schemaVersion": 39,
+  "editable": true,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "10s",
+  "templating": {
+    "list": [
+      {
+        "type": "custom",
+        "name": "turtle",
+        "label": "Turtle",
+        "query": "1,2,3",
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "options": [
+          {
+            "text": "1",
+            "value": "1",
+            "selected": true
+          },
+          {
+            "text": "2",
+            "value": "2",
+            "selected": false
+          },
+          {
+            "text": "3",
+            "value": "3",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Pose",
+      "description": "From coraine's NGSI-LD temporal API.",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "coraine-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "http://coraine:1026/ngsi-ld/v1/temporal/entities/urn:ngsi-ld:Turtle:$turtle?attrs=x&timerel=between&timeAt=${__from:date:iso}&endTimeAt=${__to:date:iso}",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "x",
+          "columns": [
+            {
+              "selector": "observedAt",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "value",
+              "text": "x",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "http://coraine:1026/ngsi-ld/v1/temporal/entities/urn:ngsi-ld:Turtle:$turtle?attrs=y&timerel=between&timeAt=${__from:date:iso}&endTimeAt=${__to:date:iso}",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "y",
+          "columns": [
+            {
+              "selector": "observedAt",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "value",
+              "text": "y",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "http://coraine:1026/ngsi-ld/v1/temporal/entities/urn:ngsi-ld:Turtle:$turtle?attrs=theta&timerel=between&timeAt=${__from:date:iso}&endTimeAt=${__to:date:iso}",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "theta",
+          "columns": [
+            {
+              "selector": "observedAt",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "value",
+              "text": "theta",
+              "type": "number"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Velocity commands",
+      "description": "From coraine's NGSI-LD temporal API.",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "coraine-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "http://coraine:1026/ngsi-ld/v1/temporal/entities/urn:ngsi-ld:Turtle:$turtle?attrs=linearCommand&timerel=between&timeAt=${__from:date:iso}&endTimeAt=${__to:date:iso}",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "linearCommand",
+          "columns": [
+            {
+              "selector": "observedAt",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "json.x",
+              "text": "linear x",
+              "type": "number"
+            }
+          ]
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "http://coraine:1026/ngsi-ld/v1/temporal/entities/urn:ngsi-ld:Turtle:$turtle?attrs=angularCommand&timerel=between&timeAt=${__from:date:iso}&endTimeAt=${__to:date:iso}",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "angularCommand",
+          "columns": [
+            {
+              "selector": "observedAt",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "json.z",
+              "text": "angular z",
+              "type": "number"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

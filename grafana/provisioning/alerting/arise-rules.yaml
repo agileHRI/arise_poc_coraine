@@ -1,0 +1,68 @@
+# Copyright 2026 Seamware
+# SPDX-License-Identifier: Apache-2.0
+#
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: arise-turtles
+    folder: ARISE PoC
+    interval: 10s
+    rules:
+      - uid: arise-turtle-near-wall
+        title: Turtle near a wall
+        condition: C
+        data:
+          # A - for each turtle, the distance from its last position to the nearest wall of the arena (11.09 m)
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: coraine-history-sql
+            model:
+              refId: A
+              editorMode: code
+              format: table
+              rawQuery: true
+              rawSql: |
+                WITH last AS (
+                  SELECT DISTINCT ON (a.entity_id, a.attr_name) a.entity_id, a.attr_name, a.v_number
+                  FROM troe_attrs a
+                  WHERE a.entity_id LIKE 'urn:ngsi-ld:Turtle:%'
+                    AND a.attr_name IN ('https://uri.etsi.org/ngsi-ld/default-context/x',
+                                        'https://uri.etsi.org/ngsi-ld/default-context/y')
+                  ORDER BY a.entity_id, a.attr_name, a.modified_at DESC
+                )
+                SELECT
+                  replace(entity_id, 'urn:ngsi-ld:', '') AS turtle,
+                  LEAST(
+                    MAX(v_number) FILTER (WHERE attr_name LIKE '%/x'),
+                    11.09 - MAX(v_number) FILTER (WHERE attr_name LIKE '%/x'),
+                    MAX(v_number) FILTER (WHERE attr_name LIKE '%/y'),
+                    11.09 - MAX(v_number) FILTER (WHERE attr_name LIKE '%/y')
+                  ) AS wall_distance
+                FROM last
+                GROUP BY entity_id
+          # C - firing when a turtle is less than 1 m from a wall
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        labels:
+          severity: warning
+          system: arise-poc
+        annotations:
+          summary: '{{ $labels.turtle }} is near a wall'
+          description: '{{ $labels.turtle }} is {{ printf "%.2f" $values.A.Value }} m from the nearest wall of the arena.'

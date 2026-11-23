@@ -1,0 +1,42 @@
+{
+  "dds": {
+    "ddsmodule": {
+      "dds": {
+        "domain": 0
+      }
+    },
+    "ngsild": {
+      "defaultEntity": false,
+      "dataChannels": {
+        "rt/pose": {
+          "entities": [
+            {
+              "type": "Turtle",
+              "id": "urn:ngsi-ld:Turtle:{turtle_id}",
+              "attributes": {
+                "x":               { "column": "x", "as": "number" },
+                "y":               { "column": "y", "as": "number" },
+                "theta":           { "column": "theta", "as": "number" },
+                "linearVelocity":  { "column": "linear_velocity", "as": "number" },
+                "angularVelocity": { "column": "angular_velocity", "as": "number" },
+                "inArena":         { "relationship": "urn:ngsi-ld:Arena:turtlesim" }
+              }
+            }
+          ]
+        },
+        "rt/cmd_vel": {
+          "entities": [
+            {
+              "type": "Turtle",
+              "id": "urn:ngsi-ld:Turtle:{turtle_id}",
+              "attributes": {
+                "linearCommand":  { "json": "linear" },
+                "angularCommand": { "json": "angular" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

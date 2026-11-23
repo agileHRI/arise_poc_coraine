@@ -1,0 +1,26 @@
+# Copyright 2026 Seamware
+# SPDX-License-Identifier: Apache-2.0
+#
+apiVersion: 1
+
+datasources:
+  # coraine's temporal history, read with SQL (TimescaleDB database "arise").
+  - name: coraine-history-sql
+    uid: coraine-history-sql
+    type: grafana-postgresql-datasource
+    url: timescale:5432
+    user: coraine
+    secureJsonData:
+      password: coraine
+    jsonData:
+      database: arise
+      sslmode: disable
+      timescaledb: true
+
+  # coraine's NGSI-LD API (current state and temporal API), read with the Infinity plugin.
+  - name: coraine-api
+    uid: coraine-api
+    type: yesoreyeram-infinity-datasource
+    jsonData:
+      allowedHosts:
+        - http://coraine:1026

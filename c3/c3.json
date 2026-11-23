@@ -1,0 +1,13 @@
+{
+  "name": "ARISE PoC",
+  "broker": "http://127.0.0.1:1026",
+  "tenant": null,
+  "view": { "mode": "graph", "relationships": "all" },
+  "watch": ["Turtle", "Arena", "RobotCell"],
+  "alerts": [
+    { "id": "turtle-east-wall",  "title": "Turtle near the east wall",  "severity": "warning", "type": "Turtle", "q": "x>10" },
+    { "id": "turtle-west-wall",  "title": "Turtle near the west wall",  "severity": "warning", "type": "Turtle", "q": "x<1" },
+    { "id": "turtle-north-wall", "title": "Turtle near the north wall", "severity": "warning", "type": "Turtle", "q": "y>10" },
+    { "id": "turtle-south-wall", "title": "Turtle near the south wall", "severity": "warning", "type": "Turtle", "q": "y<1" }
+  ]
+}

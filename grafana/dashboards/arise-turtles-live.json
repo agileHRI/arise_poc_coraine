@@ -1,0 +1,251 @@
+{
+  "uid": "arise-turtles-live",
+  "title": "ARISE PoC - Turtles (live, SQL)",
+  "tags": [
+    "arise",
+    "coraine"
+  ],
+  "schemaVersion": 39,
+  "editable": true,
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "refresh": "5s",
+  "templating": {
+    "list": [
+      {
+        "type": "custom",
+        "name": "turtle",
+        "label": "Turtle",
+        "query": "1,2,3",
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "options": [
+          {
+            "text": "1",
+            "value": "1",
+            "selected": true
+          },
+          {
+            "text": "2",
+            "value": "2",
+            "selected": false
+          },
+          {
+            "text": "3",
+            "value": "3",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Position (x, y)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  replace(a.attr_name, 'https://uri.etsi.org/ngsi-ld/default-context/', '') AS metric,\n  a.v_number AS value\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Turtle:$turtle'\n  AND a.attr_name IN ('https://uri.etsi.org/ngsi-ld/default-context/x', 'https://uri.etsi.org/ngsi-ld/default-context/y')\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Heading (theta)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  replace(a.attr_name, 'https://uri.etsi.org/ngsi-ld/default-context/', '') AS metric,\n  a.v_number AS value\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Turtle:$turtle'\n  AND a.attr_name IN ('https://uri.etsi.org/ngsi-ld/default-context/theta')\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Linear velocity command",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  (a.v_compound->>'x')::real AS \"linear x\"\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Turtle:$turtle'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/linearCommand'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Turtle $turtle - Angular velocity command",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "coraine-history-sql"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "coraine-history-sql"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  a.modified_at AS time,\n  (a.v_compound->>'z')::real AS \"angular z\"\nFROM troe_attrs a\nWHERE a.entity_id = 'urn:ngsi-ld:Turtle:$turtle'\n  AND a.attr_name = 'https://uri.etsi.org/ngsi-ld/default-context/angularCommand'\n  AND $__timeFilter(a.modified_at)\nORDER BY 1"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Turtles now (coraine NGSI-LD API)",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "coraine-api"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "coraine-api"
+          },
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "http://coraine:1026/ngsi-ld/v1/entities?type=Turtle",
+          "url_options": {
+            "method": "GET",
+            "data": ""
+          },
+          "root_selector": "",
+          "columns": [
+            {
+              "selector": "id",
+              "text": "Turtle",
+              "type": "string"
+            },
+            {
+              "selector": "x.value",
+              "text": "x",
+              "type": "number"
+            },
+            {
+              "selector": "y.value",
+              "text": "y",
+              "type": "number"
+            },
+            {
+              "selector": "theta.value",
+              "text": "theta",
+              "type": "number"
+            },
+            {
+              "selector": "x.observedAt",
+              "text": "observedAt",
+              "type": "timestamp"
+            },
+            {
+              "selector": "inArena.object",
+              "text": "inArena",
+              "type": "string"
+            }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

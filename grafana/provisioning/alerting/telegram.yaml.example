@@ -1,0 +1,31 @@
+# Copyright 2026 Seamware
+# SPDX-License-Identifier: Apache-2.0
+#
+# Optional: send the ARISE alerts to a Telegram chat.
+#
+# 1. Create a bot with @BotFather and get its token; get the chat id of the chat that receives the alerts.
+# 2. Copy this file to telegram.yaml (same folder) and replace the two values below. Keep the quotes:
+#    the chat id must be a string (group chat ids start with -100).
+# 3. Restart Grafana: docker compose restart grafana
+#
+# telegram.yaml holds a secret: do not commit it (it is in .gitignore).
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: arise-telegram
+    receivers:
+      - uid: arise-telegram
+        type: telegram
+        settings:
+          bottoken: "<your bot token>"
+          chatid: "<your chat id>"
+          parse_mode: HTML
+
+policies:
+  - orgId: 1
+    receiver: arise-telegram
+    group_by: ["alertname", "turtle"]
+    group_wait: 5s
+    group_interval: 1m
+    repeat_interval: 1h
