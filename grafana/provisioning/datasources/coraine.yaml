@@ -24,3 +24,26 @@ datasources:
     jsonData:
       allowedHosts:
         - http://coraine:1026
+
+  # The same two, for the tenant "arise", where the OPC UA part lives (written by the IoT Agent).
+  - name: coraine-history-sql-arise
+    uid: coraine-history-sql-arise
+    type: grafana-postgresql-datasource
+    url: timescale:5432
+    user: coraine
+    secureJsonData:
+      password: coraine
+    jsonData:
+      database: arise_arise
+      sslmode: disable
+      timescaledb: true
+
+  - name: coraine-api-arise
+    uid: coraine-api-arise
+    type: yesoreyeram-infinity-datasource
+    jsonData:
+      allowedHosts:
+        - http://coraine:1026
+      httpHeaderName1: NGSILD-Tenant
+    secureJsonData:
+      httpHeaderValue1: arise

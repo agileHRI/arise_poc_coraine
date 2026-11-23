@@ -1,0 +1,10 @@
+{
+  "name": "ARISE PoC - OPC UA",
+  "broker": "http://127.0.0.1:1026",
+  "tenant": "arise",
+  "view": { "mode": "graph", "relationships": "all" },
+  "watch": ["Machine", "RobotCell"],
+  "alerts": [
+    { "id": "press-temperature-high", "title": "Press temperature high", "severity": "critical", "type": "Machine", "q": "temperature>103" }
+  ]
+}

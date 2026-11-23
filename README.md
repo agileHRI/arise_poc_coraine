@@ -5,10 +5,12 @@ three ROS 2 turtles become NGSI-LD entities, their history goes to TimescaleDB, 
 and over time, and the coraine Control Center (c³) shows the turtles as a live graph with alarms.
 
 ```text
-turtlesim (ROS 2) ──DDS──►  coraine  ──►  TimescaleDB  ──SQL──────────────►  Grafana
-                               ├──── NGSI-LD temporal API ────────────────────┘
-                               └──── NGSI-LD API + live notifications ──────►  c³
+turtlesim (ROS 2) ──DDS──────────────►  coraine  ──►  TimescaleDB  ──SQL──►  Grafana
+OPC UA server ──► FIWARE IoT Agent ──►     │  (NGSI-LD temporal API) ──────────┘
+                                           └── NGSI-LD API + live notifications ──►  c³
 ```
+
+The ROS 2 turtles are in coraine's default tenant; the OPC UA press is in the tenant `arise`.
 
 **The step-by-step guide is in the ARISE documentation:**
 [Run the ARISE PoC with coraine](https://arise-framework-documentation.readthedocs.io/en/latest/rst/how_to/arise_poc_coraine/arise_poc_coraine.html).
@@ -39,8 +41,10 @@ Then:
 - **Grafana** - http://localhost:3000 (`admin` / `admin`), folder **ARISE PoC**: two dashboards and the
   alert rule *Turtle near a wall*. Telegram: see
   [`telegram.yaml.example`](grafana/provisioning/alerting/telegram.yaml.example).
-- **c³** - add `"demos": { "arise": { "url": "http://127.0.0.1:7996/c3.json" } }` to `~/.config/c3/c3.json`,
-  start `c3`, type `arise` in Explore and press **Connect**.
+- **coraine, OPC UA press** - `curl -s -H 'NGSILD-Tenant: arise' localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Machine:press-1`
+- **c³** - add two demos to `~/.config/c3/c3.json`:
+  `"demos": { "arise": { "url": "http://127.0.0.1:7996/c3.json" }, "arise-opcua": { "url": "http://127.0.0.1:7996/c3-opcua.json" } }`,
+  start `c3`, type `arise` (turtles) or `arise-opcua` (press) in Explore and press **Connect**.
 
 Stop with `docker compose down` (`-v` also deletes the data).
 
@@ -51,17 +55,19 @@ these ports to a network you do not trust.
 
 | Path | What |
 |---|---|
-| `docker-compose.yaml` | timescale, coraine, seed, c3-descriptor, ros2, grafana |
+| `docker-compose.yaml` | timescale, coraine, seed, opcplc, iot-agent, iot-provision, c3-descriptor, ros2, grafana |
 | `dds.json` | the DDS bridge mapping: ROS 2 topics → `Turtle` entities (DataChannels) |
-| `seed/arena.json` | the static model: the robot cell and the arena |
-| `c3/c3.json` | the c³ demo descriptor: graph view, types, alarms |
+| `seed/arena.json`, `seed/cell-opcua.json` | the static model: the robot cell and the arena (and the cell again in tenant `arise`) |
+| `seed/press-device.json` | the IoT Agent provisioning: which OPC UA node becomes which attribute of the press |
+| `c3/c3.json`, `c3/c3-opcua.json` | the c³ demo descriptors: graph view, types, alarms |
 | `ros2/Dockerfile` | Vulcanexus Jazzy with eProsima's keyed turtlesim |
 | `grafana/` | data sources, dashboards and alert rules (provisioned) |
 
 ## Status
 
-The ROS 2 part of the PoC. Next: OPC UA (through coraine's OPC UA bridge) - see [CHANGELOG.md](CHANGELOG.md)
-and the issues.
+The ROS 2 part and the OPC UA part of the PoC. OPC UA goes through the FIWARE IoT Agent for now; it will
+move to coraine's own OPC UA bridge, which will also put the press in the same tenant as the turtles.
+See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
